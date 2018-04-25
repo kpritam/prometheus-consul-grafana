@@ -1,11 +1,11 @@
 {
 	"name": "perf4",
-	"address": "ec2-54-147-220-26.compute-1.amazonaws.com",
+	"address": "52.71.110.213",
 	"port": 9100,
 	"check": {
 		"id": "api",
 		"name": "Node exporter on port 9100",
-		"http": "http://ec2-54-157-248-177.compute-1.amazonaws.com:9100/health",
+		"http": "http://52.71.110.213:9100/health",
 		"interval": "10s",
 		"timeout": "1s"
 	}
