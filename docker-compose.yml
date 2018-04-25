@@ -1,26 +1,63 @@
-version: '2'
-services:
+version: '3.1'
 
+volumes:
+    prometheus_data: {}
+    grafana_data: {}
+
+networks:
+    front-tier:
+    back-tier:
+
+services:
     prometheus:
         image: prom/prometheus:latest
         volumes:
-            - $PWD:/etc/prometheus:Z
-        ports:
-            - "9090:9090"
+            - ./prometheus/:/etc/prometheus:Z
+            - prometheus_data:/prometheus
+            - '--storage.tsdb.path=/prometheus'
+            - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+            - '--web.console.templates=/usr/share/prometheus/consoles'
         command:
             - "--config.file=/etc/prometheus/prometheus.yml"
+        ports:
+            - "9090:9090"
+        networks:
+            - back-tier
 
     consul:
         image: consul
         ports:
           - "8500:8500"
+        networks:
+            - back-tier
   
     node-exporter:
         image: prom/node-exporter:latest
+        volumes:
+            - /proc:/host/proc:ro
+            - /sys:/host/sys:ro
+            - /:/rootfs:ro
+        command: 
+            - '--path.procfs=/host/proc' 
+            - '--path.sysfs=/host/sys'
+            - --collector.filesystem.ignored-mount-points
+            - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
         ports:
           - '9100:9100'
+        networks:
+            - back-tier
 
     grafana:
         image: grafana/grafana:latest
+        depends_on:
+            - prometheus
         ports:
-          - "3000:3000"
+            - "3000:3000"
+        volumes:
+            - grafana_data:/var/lib/grafana
+            - ./grafana/provisioning/:/etc/grafana/provisioning/
+        env_file:
+            - ./grafana/config.monitoring
+        networks:
+            front-tier:
+            back-tier:
