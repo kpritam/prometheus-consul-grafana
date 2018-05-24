@@ -27,12 +27,10 @@ scrape_configs:
       - targets: ['localhost:9090']
 
   # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-  - job_name: 'consul-services'
+  - job_name: 'node-exporter'
 
     # metrics_path defaults to '/metrics'
     # scheme defaults to 'http'.
-    # metrics_path:  '/prometheus'
 
-    consul_sd_configs:
-    - server:   'consul:8500'
-      services: ['perf1', 'perf2', 'perf3', 'perf4', 'perf5']
+    static_configs:
+      - targets: ['localhost:9100']

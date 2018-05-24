@@ -24,13 +24,6 @@ services:
         networks:
             - back-tier
 
-    consul:
-        image: consul
-        ports:
-          - "8500:8500"
-        networks:
-            - back-tier
-  
     node-exporter:
         image: prom/node-exporter:latest
         volumes:
